@@ -1,0 +1,15 @@
+# exit as normalUser (ubuntu)
+sudo su - ubuntu
+
+# Initialised the control plane in the master node as a normalUser
+sudo kubeadm init
+
+# Initialize Kubernetes control plane by running the below commond as regular Ubuntu-User.
+# Create .kube/config file for authentication of the cluster:
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+#verify:
+ll -l 

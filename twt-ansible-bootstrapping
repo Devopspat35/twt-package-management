@@ -1,0 +1,26 @@
+#!/bin/bash
+#set hostname to ans
+sudo hostnamectl set-hostname ans
+# Update package list
+sudo apt-get update
+# Install software-properties-common for managing PPAs
+sudo apt-get install -y software-properties-common
+# Add Ansible PPA (Personal Package Archive) to the system
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+# Install Ansible
+sudo apt-get install -y ansible
+# Verify Ansible installation
+ansible --version
+# Create a new user and configure for Ansible
+sudo useradd -m -s /bin/bash ansible
+sudo passwd ansible <<EOF
+fonxxxxxxxxxxxxxxxxxxx
+EOF
+# Allow the new user to use sudo without a password (optional)
+echo 'ansible ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/ansible
+# Add the public key to the user's authorized_keys for SSH access (optional)
+mkdir -p /home/ansible/.ssh
+echo "ssh-rsa class35 your-public-key" > /home/ansible/.ssh/authorized_keys
+chown -R ansible:ansible /home/ansible/.ssh
+chmod 400 /home/ansible/.ssh/authorized_keys
+
