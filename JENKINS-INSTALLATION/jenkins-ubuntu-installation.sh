@@ -15,4 +15,4 @@ sudo dnf install jenkins
 # Start Jenkins
 sudo systemctl daemon-reload  # To Register the Jenkins service 
 sudo systemctl start jenkins
-systemctl status jenkins
+systemctl enable jenkins
