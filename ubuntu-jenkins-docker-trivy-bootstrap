@@ -15,7 +15,7 @@ sudo systemctl enable docker
 # create jenkins-user
 sudo adduser jenkins
 sudo passwd jenkins <<EOF
-foncha
+fon@12345
 EOF
 sudo echo "jenkins ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/jenkins
 # install jenkins on ubuntu
