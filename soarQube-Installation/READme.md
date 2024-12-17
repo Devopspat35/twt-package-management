@@ -1,66 +1,40 @@
-# SonarQube Installation And Setup In AWS EC2 Redhat Instance.
-# Prerequisite
-+ AWS Acccount.
-+ Create Redhat EC2 T2.medium Instance with 4GB RAM.
-+ Create Security Group and open Required ports.
-   + 9000 ..etc
-+ Attach Security Group to EC2 Instance.
-+ Install java openJDK 1.8+ for SonarQube version 7.8
-
-## 1. Create sonar user to manage the SonarQube server
-```sh
-#As a good security practice, SonarQuber Server is not advised to run sonar service as a root user, 
-# create a new user called sonar and grant sudo access to manage sonar services as follows
+#!/bin/bash
+# sudo -i      needed for boostrapping only
+sudo hostnamectl set-hostname  sonar
 sudo timedatectl set-timezone America/New_York
-sudo useradd sonar
-# Grand sudo access to sonar user
+sudo yum update -y
+sudo yum install tree nano dnf git wget rpm vim -y
+sudo yum install net-tools unzip gnupg2 curl nginx -y
+sudo yum remove java* -y
+sudo yum install openjdk-11-jre -y
+# create sonar-user
+sudo adduser sonar
+sudo passwd sonar <<EOF
+fon@123
+EOF
 sudo echo "sonar ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/sonar
-# set hostname for the sonarqube server
-sudo hostnamectl set-hostname sonar 
-sudo su - sonar
-```
-## 1b. Assign password to sonar user
-```sh
-sudo passwd sonar
-```
-## 2. Enable PasswordAuthentication in the server
-```sh
+# Enable PasswordAuthentication in the server
 sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
 sudo service sshd restart
-```
-### 3. Install Java JDK 1.8+ required for sonarqube to start
-
-``` sh
 cd /opt
-sudo yum -y install unzip wget git
-sudo yum install  java-11-openjdk-devel
-```
-### 4. Download and extract the SonarqQube Server software.
-```sh
-sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.8.zip
-sudo unzip sonarqube-7.8.zip
-sudo rm -rf sonarqube-7.8.zip
-sudo mv sonarqube-7.8 sonarqube
-```
+# install sonarqube on ubuntu
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.5.1.90531.zip
+sudo unzip sonarqube-10.5.1.90531.zip
+sudo rm -rf sonarqube-10.5.1.90531.zip
+sudo mv sonarqube-10.5.1.90531 sonarqube
+# Grant file permissions for sonar user to start and manage sonarQube
+sudo chown -R sonar:sonar sonarqube/
+sudo chmod -R 775 sonarqube/
+# start sonarQube server
+sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+# sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
+sudo systemctl daemon-reload
+sudo systemctl enable sonarqube.service
+sudo systemctl start sonarqube.service
+# install maven nodoje and npm on redhat
+sudo yum install maven nodejs npm -y
+sudo su - sonar
+# accessed port:9000
+# default USERNAME: admin
+# default password: admin
 
-## 5. Grant file permissions for sonar user to start and manage sonarQube
-```sh
-sudo chown -R sonar:sonar /opt/sonarqube/
-sudo chmod -R 775 /opt/sonarqube/
-```
-### 6. start sonarQube server
-```sh
-sh /opt/sonarqube/bin/linux-x86-64/sonar.sh start 
-sh /opt/sonarqube/bin/linux-x86-64/sonar.sh status
-```
-
-### 7. Ensure that SonarQube is running and Access sonarQube on the browser
-# sonarqube default port is = 9000
-# get the sonarqube public ip address 
-# publicIP:9000
-```sh
-curl -v localhost:9000
-54.236.232.85:9000
-default USERNAME: admin
-default password: admin
-```
